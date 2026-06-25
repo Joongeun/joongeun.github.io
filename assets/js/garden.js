@@ -129,62 +129,95 @@
     }
   }
 
-  /* ---------- Side vines ---------- */
-  var vines = ["vine-left", "vine-right"].map(function (id) {
-    var cv = document.getElementById(id);
-    if (!cv) return null;
-    return { el: cv, ctx: cv.getContext("2d"), side: id === "vine-left" ? "left" : "right" };
-  }).filter(Boolean);
+  /* ---------- Falling autumn leaves in the side margins (New England fall) ---------- */
+  var leafCanvas = document.getElementById("leaves");
+  var lctx = leafCanvas ? leafCanvas.getContext("2d") : null;
 
-  function sizeVines() {
-    vines.forEach(function (v) {
-      // Only sized/visible on wide screens (CSS controls display).
-      v.el.width = 90;
-      v.el.height = window.innerHeight;
-    });
+  var LEAF_COLORS = ["#d2451e", "#e8731c", "#f0a826", "#c9302c", "#a8531c", "#e0b020", "#b5471f"];
+  // 9x9 maple-leaf silhouette (stem at the bottom).
+  var LEAF_BMP = [
+    "000100000",
+    "100100010",
+    "010101100",
+    "001111000",
+    "111111110",
+    "000111000",
+    "001010100",
+    "000010000",
+    "000010000"
+  ].map(function (row) { return row.split("").map(function (ch) { return ch === "1"; }); });
+
+  var leaves = [], leafW = 0, leafH = 0;
+  var CONTENT_HALF = 500; // half of the 1000px content column
+
+  function gutter() { return Math.max(0, (leafW / 2) - CONTENT_HALF); }
+
+  // (re)seed one leaf. atTop=true respawns it just above the viewport.
+  function seed(le, atTop) {
+    var gw = gutter();
+    var side = Math.random() < 0.5 ? -1 : 1;            // -1 left margin, +1 right
+    var lx = 8 + Math.random() * Math.max(2, gw - 16);  // x within the margin
+    le.side = side;
+    le.x = side < 0 ? lx : leafW - lx;
+    le.y = atTop ? -16 - Math.random() * 80 : Math.random() * leafH;
+    le.vy = 0.45 + Math.random() * 0.9;
+    le.vx = side * (0.05 + Math.random() * 0.3);         // drift outward, toward the edge
+    le.sway = 0.4 + Math.random() * 0.9;
+    le.phase = Math.random() * Math.PI * 2;
+    le.angle = Math.random() * Math.PI * 2;
+    le.spin = (Math.random() - 0.5) * 0.04;
+    le.scale = 0.85 + Math.random() * 0.8;
+    le.color = LEAF_COLORS[(Math.random() * LEAF_COLORS.length) | 0];
+    return le;
   }
-  sizeVines();
-  window.addEventListener("resize", function () { sizeVines(); placePlants(); }, { passive: true });
 
-  function drawVine(v, t) {
-    var ctx = v.ctx, h = v.el.height, w = v.el.width;
-    ctx.clearRect(0, 0, w, h);
-    var baseX = v.side === "left" ? 20 : w - 20;
-    var dir = v.side === "left" ? 1 : -1;          // leaves grow inward
-    var amp = reduced ? 0 : 1;
-    var i = 0;
-    for (var py = h; py >= -8; py -= 4) {
-      var k = h - py;
-      var x = baseX + Math.sin(k * 0.018 + t * 0.0006 * amp) * 11;
-      // stem
-      ctx.fillStyle = (i % 2 === 0) ? C.stem : C.stemD;
-      ctx.fillRect(Math.round(x), py, 5, 4);
-      // leaves at intervals, alternating reach
-      if (i % 7 === 0) {
-        var ly = py;
-        var lx = Math.round(x) + (dir > 0 ? 4 : 0);
-        ctx.fillStyle = (i % 14 === 0) ? C.leaf : C.leafD;
-        ctx.fillRect(lx, ly, dir * 8, 4);
-        ctx.fillRect(lx + dir * 6, ly - 4, dir * 6, 4);
-        ctx.fillRect(lx + dir * 10, ly - 6, dir * 4, 4);
-        ctx.fillStyle = C.leafL;
-        ctx.fillRect(lx + dir * 12, ly - 6, dir * 2, 2);
+  function initLeaves() {
+    if (!leafCanvas) return;
+    leafW = leafCanvas.width = window.innerWidth;
+    leafH = leafCanvas.height = window.innerHeight;
+    leaves = [];
+    if (reduced) return;                                 // honor reduced-motion: no falling leaves
+    var gw = gutter();
+    if (gw < 70) return;                                 // margins too narrow — skip to protect content
+    var count = Math.max(4, Math.min(14, Math.round(gw / 22)));
+    for (var i = 0; i < count; i++) leaves.push(seed({}, false));
+  }
+  initLeaves();
+  var resizeT;
+  window.addEventListener("resize", function () {
+    clearTimeout(resizeT);
+    resizeT = setTimeout(function () { placePlants(); initLeaves(); }, 150);
+  }, { passive: true });
+
+  function drawLeaf(le) {
+    lctx.save();
+    lctx.translate(le.x, le.y);
+    lctx.rotate(le.angle);
+    var p = 2 * le.scale, s = Math.ceil(p);
+    lctx.fillStyle = le.color;
+    for (var r = 0; r < 9; r++) {
+      for (var c = 0; c < 9; c++) {
+        if (LEAF_BMP[r][c]) lctx.fillRect(Math.round((c - 4) * p), Math.round((r - 4) * p), s, s);
       }
-      // occasional flower bud on the vine
-      if (i % 23 === 11) {
-        ctx.fillStyle = (i % 46 === 11) ? C.goldP : C.pinkP;
-        ctx.fillRect(Math.round(x) + (dir > 0 ? 5 : -3), py - 2, 4, 4);
-      }
-      i++;
     }
+    lctx.restore();
+  }
+
+  function updateLeaf(le) {
+    le.y += le.vy;
+    le.phase += 0.02;
+    le.x += le.vx + Math.sin(le.phase) * le.sway;
+    le.angle += le.spin;
+    if (le.y > leafH + 24 || le.x < -24 || le.x > leafW + 24) seed(le, true);
   }
 
   /* ---------- Loop ---------- */
   function frame(t) {
     plants.forEach(function (p) { drawPlant(p, t); });
-    // offsetWidth is 0 when CSS display:none (narrow screens); fixed elements
-    // always report offsetParent===null, so we must not use that here.
-    vines.forEach(function (v) { if (v.el.offsetWidth > 0) drawVine(v, t); });
+    if (lctx && leaves.length) {
+      lctx.clearRect(0, 0, leafW, leafH);
+      for (var i = 0; i < leaves.length; i++) { updateLeaf(leaves[i]); drawLeaf(leaves[i]); }
+    }
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);

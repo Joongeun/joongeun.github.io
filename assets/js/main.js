@@ -57,29 +57,26 @@
   function setActive(id) {
     navLinks.forEach(function (l) { l.classList.toggle("active", l.dataset.target === id); });
   }
-  if (sections.length && "IntersectionObserver" in window) {
-    var visible = {};
-    var spy = new IntersectionObserver(function (entries) {
-      entries.forEach(function (e) { visible[e.target.id] = e.isIntersecting ? e.intersectionRatio : 0; });
-      // Pick the section currently occupying the top-most visible slot.
-      var best = null, bestTop = Infinity;
-      sections.forEach(function (s) {
-        var top = s.getBoundingClientRect().top;
-        if (top <= 120 && top > -s.offsetHeight && top < bestTop) { bestTop = top; best = s.id; }
-      });
-      if (best) setActive(best);
-      else if (window.scrollY < 200) setActive(null);
-    }, { rootMargin: "-60px 0px -55% 0px", threshold: [0, 0.25, 0.5, 1] });
-    sections.forEach(function (s) { spy.observe(s); });
-    // Also re-evaluate on scroll for smooth highlight near the top.
-    window.addEventListener("scroll", function () {
-      var best = null, bestTop = Infinity;
-      sections.forEach(function (s) {
-        var top = s.getBoundingClientRect().top;
-        if (top <= 120 && top < bestTop && top > -s.offsetHeight) { bestTop = top; best = s.id; }
-      });
-      if (best) setActive(best); else if (window.scrollY < 200) setActive(null);
-    }, { passive: true });
+  function computeActive() {
+    // The last section is often too short to ever reach the top threshold, so
+    // when we've scrolled to the bottom of the page, force-activate it.
+    var doc = document.documentElement;
+    var atBottom = window.innerHeight + window.scrollY >= doc.scrollHeight - 4;
+    if (atBottom) { setActive(sections[sections.length - 1].id); return; }
+    // Active section = the LAST one whose top has scrolled above the threshold
+    // line (just below the navbar): i.e. the largest top that is still <= 120.
+    var best = null, bestTop = -Infinity;
+    sections.forEach(function (s) {
+      var top = s.getBoundingClientRect().top;
+      if (top <= 120 && top > bestTop) { bestTop = top; best = s.id; }
+    });
+    if (best) setActive(best);
+    else setActive(null);
+  }
+  if (sections.length) {
+    window.addEventListener("scroll", computeActive, { passive: true });
+    window.addEventListener("resize", computeActive, { passive: true });
+    computeActive();
   }
 
   /* ---------- Card spotlight (cursor-tracked glow) ---------- */

@@ -267,15 +267,11 @@ footer { margin-top: 90px; padding: 40px 0 0; border-top: 1px solid var(--border
   transform: translateX(-50%);
 }
 
-/* ---------- Climbing vines (side margins) ---------- */
-.vine {
-  position: fixed; top: 0; bottom: 0; height: 100vh; width: 90px;
-  z-index: 2; pointer-events: none; image-rendering: pixelated;
-  display: none; /* shown only when the margins are wide enough */
+/* ---------- Falling autumn leaves (side margins) ---------- */
+.leaves {
+  position: fixed; inset: 0; width: 100vw; height: 100vh;
+  z-index: 3; pointer-events: none; image-rendering: pixelated;
 }
-.vine-left { left: 0; }
-.vine-right { right: 0; }
-@media (min-width: 1280px) { .vine { display: block; } }
 
 /* ---------- Responsive ---------- */
 @media (max-width: 768px) {
