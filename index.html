@@ -47,16 +47,8 @@ layout: default
 
 <footer class="reveal">
   <p class="copyright">&copy; {{ 'now' | date: "%Y" }} {{ p.name }} | Berkeley Mechanical Engineering</p>
-  <div class="visitor-map">
-    {%- comment -%}
-      The globe.js script registers each visit (the counter keeps working).
-      Its own click target points at mapmyvisitors.com, which is why it felt
-      "broken" — so we wrap it in an explicit link to YOUR public stats page.
-      Set `mapmyvisitors_url` in _config.yml to your dashboard link.
-    {%- endcomment -%}
-    <a href="{{ site.mapmyvisitors_url | default: 'https://mapmyvisitors.com/web/' }}"
-       target="_blank" rel="noopener" class="globe-wrapper" title="View visitor map &amp; counter">
-      <script type="text/javascript" id="mmvst_globe" src="//mapmyvisitors.com/globe.js?d=H3VH_EyyM88uU7JrbiTEU4auPfVvP8lBdYsCzL19htE"></script>
-    </a>
+  <div class="visitor-map" title="Visitor map">
+    <!-- mapmyvisitors map widget (stats at https://mapmyvisitors.com/web/1c5fj) -->
+    <script type="text/javascript" id="mapmyvisitors" src="//mapmyvisitors.com/map.js?d=2PXi1FlaM5QtE5um1GtJuIw1tUsNsgw3P5Xg_U7YSiQ&cl=ffffff&w=a"></script>
   </div>
 </footer>

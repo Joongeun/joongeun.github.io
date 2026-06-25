@@ -13,10 +13,8 @@ url: ""
 baseurl: ""
 
 # --- Integrations ---
-# Your public mapmyvisitors dashboard link. Get it from your mapmyvisitors
-# account ("Public profile" / "HTML link") and paste it here so the globe
-# click-through opens YOUR visitor counter page.
-mapmyvisitors_url: "https://mapmyvisitors.com/web/"
+# Your public mapmyvisitors stats page (the map widget links here).
+mapmyvisitors_url: "https://mapmyvisitors.com/web/1c5fj"
 
 # Cloudflare Web Analytics beacon token (privacy-first, auto bot-filtering).
 # Optional: if you enable analytics directly on the Cloudflare Pages project,
@@ -38,6 +36,7 @@ exclude:
   - node_modules
   - .ruby-version
   - "*.md"
+  - functions   # Cloudflare Pages Functions — picked up from the repo root, not the Jekyll build
 
 # Keep the legacy Google Search Console verification file as-is.
 keep_files:

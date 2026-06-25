@@ -15,15 +15,32 @@
   var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   function now() { return performance.now(); }
 
-  /* ---------- Persistence ---------- */
-  var KEY = "joon_eggs_v1";
-  var DEFAULT = { v: 1, gateway: false, stage1: false, stage2: false, stage3: false, upgrade: 0 };
-  function load() {
-    try { var s = JSON.parse(localStorage.getItem(KEY)); return (s && s.v === 1) ? s : Object.assign({}, DEFAULT); }
-    catch (e) { return Object.assign({}, DEFAULT); }
+  /* ---------- State (in-memory only: the journey resets on every page load) ---------- */
+  var state = { gateway: false, stage1: false, stage2: false, stage3: false, upgrade: 0 };
+
+  /* ---------- Step-1 counter (owner-only metric) ----------
+   * Pings a Cloudflare Pages Function (/api/egg) the first time a given browser
+   * solves step 1 (the Konami code). A tiny separate localStorage flag dedupes so
+   * each person is counted once — it does NOT restore game progress. View the tally
+   * by opening the site with ?eggstats (or GET /api/egg). No-ops if the endpoint
+   * isn't deployed yet, so it's harmless locally. */
+  var METRIC_KEY = "joon_egg_metric_v1";
+  function recordStep1() {
+    var done = false;
+    try { done = localStorage.getItem(METRIC_KEY) === "1"; } catch (e) {}
+    if (done) return;
+    try { localStorage.setItem(METRIC_KEY, "1"); } catch (e) {}
+    try { fetch("/api/egg", { method: "POST", keepalive: true }).catch(function () {}); } catch (e) {}
   }
-  function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
-  var state = load();
+  function showStatsBadge() {
+    if (!/[?&]eggstats\b/.test(location.search)) return;
+    fetch("/api/egg").then(function (r) { return r.json(); }).then(function (d) {
+      var b = document.createElement("div");
+      b.className = "egg-stats-badge";
+      b.textContent = "🥚 step 1 solved by " + (d && d.step1 != null ? d.step1 : "?") + " people";
+      document.body.appendChild(b);
+    }).catch(function () {});
+  }
 
   /* ---------- Verse data (NIV — edit here) ---------- */
   var ATTRIB = "Scripture quotations taken from the Holy Bible, New International Version® NIV®. " +
@@ -38,7 +55,7 @@
   function emit(name, detail) { document.dispatchEvent(new CustomEvent(name, { detail: detail })); }
   function robotSay(msg, ms) { emit("robot:say", { msg: msg, ms: ms || 3400 }); }
   function setUpgrade(n) {
-    state.upgrade = Math.max(state.upgrade, n); save();
+    state.upgrade = Math.max(state.upgrade, n);
     emit("robot:upgrade", { level: state.upgrade });
   }
 
@@ -91,7 +108,8 @@
   /* ---------- Stage completion ---------- */
   function complete(stageKey, verse, level) {
     if (state[stageKey]) return;
-    state[stageKey] = true; save();
+    state[stageKey] = true;
+    if (stageKey === "stage1") recordStep1();   // count people who solve step 1
     setUpgrade(level);
     showVerse(verse, advanceHints);
   }
@@ -106,7 +124,7 @@
       clickTimes.push(t);
       clickTimes = clickTimes.filter(function (tt) { return t - tt < 1500; });
       if (clickTimes.length >= 5) {
-        state.gateway = true; save();
+        state.gateway = true;
         emit("robot:spin");
         robotSay("you found a secret… gamers know the code ↑↑↓↓…", 4800);
       }
@@ -187,9 +205,9 @@
     if (!state.stage3) { revealPacket(); setupPacket(); robotSay("plant a mustard seed — drag the packet to the ground", 5200); return; }
   }
 
-  /* ---------- Resume on load ---------- */
-  setUpgrade(state.upgrade);                     // re-apply wings/halo/companion
-  if (state.stage1) armFlytrap();
-  if (state.stage2) { revealPacket(); setupPacket(); }
+  /* ---------- On load ---------- */
+  // No persistence: the journey always starts fresh. First hint waits for the
+  // gateway to be discovered.
   setTimeout(advanceHints, 6000);
+  showStatsBadge();                              // owner-only: shows the tally when ?eggstats is in the URL
 })();

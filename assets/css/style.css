@@ -215,11 +215,6 @@ h2 {
 /* ---------- Footer ---------- */
 footer { margin-top: 90px; padding: 40px 0 0; border-top: 1px solid var(--border-color); text-align: center; }
 .copyright { font-family: var(--mono-font); font-size: 0.78rem; opacity: 0.6; }
-.globe-wrapper {
-  display: inline-block; width: 50px; margin-top: 20px;
-  filter: grayscale(100%); opacity: 0.5; transition: 0.3s;
-}
-.globe-wrapper:hover { filter: grayscale(0%); opacity: 1; transform: scale(1.1); }
 
 /* ---------- Scroll reveal ---------- */
 .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
@@ -249,13 +244,21 @@ footer { margin-top: 90px; padding: 40px 0 0; border-top: 1px solid var(--border
   border: 6px solid transparent; border-top-color: var(--cal-gold);
 }
 
-/* ---------- Visitor map / counter ---------- */
-.visitor-map { display: flex; flex-direction: column; align-items: center; gap: 6px; margin-top: 16px; }
-.visitor-link {
-  font-family: var(--mono-font); font-size: 0.7rem; color: var(--text-dim);
-  text-decoration: none; border-bottom: 1px dotted var(--text-dim);
+/* ---------- Visitor map widget ---------- */
+.visitor-map {
+  display: inline-block; margin-top: 18px; max-width: 280px;
+  opacity: 0.78; transition: opacity 0.3s ease;
 }
-.visitor-link:hover { color: var(--cal-gold); border-bottom-color: var(--cal-gold); }
+.visitor-map:hover { opacity: 1; }
+.visitor-map img, .visitor-map canvas { max-width: 100%; height: auto; border-radius: 6px; }
+
+/* ---------- Owner-only step-1 counter badge (shown with ?eggstats) ---------- */
+.egg-stats-badge {
+  position: fixed; top: 60px; left: 12px; z-index: 10001;
+  font-family: var(--mono-font); font-size: 0.72rem; color: var(--cal-gold);
+  background: var(--card-bg); border: 1px solid var(--cal-gold);
+  border-radius: 6px; padding: 6px 10px; box-shadow: 0 4px 14px rgba(0,0,0,0.45);
+}
 
 /* ---------- Garden (bottom plants) ---------- */
 .garden {
