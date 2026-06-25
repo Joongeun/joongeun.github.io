@@ -2,11 +2,18 @@
 
 This site is a Jekyll site. Cloudflare Pages builds it on every push.
 
+> ⚠️ **Use the Pages flow, NOT the Workers / Wrangler "auto-config" import.**
+> The Workers flow wraps the build as `npx bundle exec jekyll build`, and `npx`
+> can't run Ruby's `bundle` → it fails with *"could not determine executable to
+> run."* A Jekyll build must run as a plain shell command (Pages does this), not
+> via npx. If you accidentally made a Workers project, delete it and create a
+> **Pages** project as below.
+
 ## 1. Connect the repo (one-time, ~3 min)
 
-1. Go to **dash.cloudflare.com → Workers & Pages → Create → Pages → "Connect to Git"**.
+1. Go to **dash.cloudflare.com → Workers & Pages → Create →** choose the **Pages** tab **→ "Connect to Git"**.
 2. Authorize GitHub and select **Joongeun/joongeun.github.io**.
-3. **Production branch:** `redesign` (or merge `redesign` → `main` first and use `main`).
+3. **Production branch:** `main`.
 4. **Build settings:**
    | Field | Value |
    |-------|-------|
