@@ -53,22 +53,22 @@
     overlay.setAttribute("aria-describedby", "verse-text");
     overlay.innerHTML =
       '<div class="verse-card">' +
+        '<button type="button" class="verse-x" aria-label="Close">×</button>' +
         '<div class="verse-ref" id="verse-ref"></div>' +
         '<p class="verse-text" id="verse-text"></p>' +
         '<div class="verse-upgrade"></div>' +
-        '<button type="button" class="verse-close">[ continue ]</button>' +
         '<div class="verse-attrib">' + ATTRIB + "</div>" +
       "</div>";
     document.body.appendChild(overlay);
     refEl = overlay.querySelector(".verse-ref");
     textEl = overlay.querySelector(".verse-text");
     upEl = overlay.querySelector(".verse-upgrade");
-    closeBtn = overlay.querySelector(".verse-close");
+    closeBtn = overlay.querySelector(".verse-x");
     closeBtn.addEventListener("click", closeVerse);
-    overlay.addEventListener("click", function (e) { if (e.target === overlay) closeVerse(); });
+    // Intentionally NO backdrop-click and NO Escape close: the × is the only way
+    // out, so stray/spam clicks on the page can't dismiss the box prematurely.
     overlay.addEventListener("keydown", function (e) {
-      if (e.key === "Escape") { closeVerse(); }
-      else if (e.key === "Tab") { e.preventDefault(); closeBtn.focus(); } // single control -> trap
+      if (e.key === "Tab") { e.preventDefault(); closeBtn.focus(); } // single control -> trap
     });
   }
   function showVerse(v, onClose) {
@@ -184,7 +184,7 @@
     if (!state.gateway) return;                 // discovery; first hint comes from the gateway itself
     if (!state.stage1) { robotSay("try the old gamer code… ↑↑↓↓←→←→ B A", 5200); return; }
     if (!state.stage2) { armFlytrap(); robotSay("something's hungry in the garden… feed it (×3)", 5200); return; }
-    if (!state.stage3) { revealPacket(); setupPacket(); robotSay("plant a seed — drag the packet to the ground", 5200); return; }
+    if (!state.stage3) { revealPacket(); setupPacket(); robotSay("plant a mustard seed — drag the packet to the ground", 5200); return; }
   }
 
   /* ---------- Resume on load ---------- */

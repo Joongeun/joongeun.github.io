@@ -105,6 +105,26 @@
   }
   placePlants();
 
+  // Mustard tree (parable of the mustard seed): trunk + leafy canopy with
+  // yellow mustard blossoms and a little bird perched in the branches.
+  function tree(c) {
+    var bark = "#7a4a24", barkD = "#5e3718";
+    c(5, 11, 2, 9, bark); c(6, 11, 1, 9, barkD);        // trunk
+    c(4, 19, 1, 1, barkD); c(7, 19, 1, 1, barkD);        // root flare
+    // canopy (layered greens)
+    c(3, 6, 6, 5, C.leafD);
+    c(2, 7, 8, 3, C.leaf);
+    c(4, 3, 4, 4, C.leaf);
+    c(3, 4, 6, 2, C.leafL);
+    c(7, 8, 2, 3, C.leafD);
+    c(2, 9, 1, 1, C.leafD);
+    // mustard blossoms
+    c(4, 7, 1, 1, C.goldP); c(7, 6, 1, 1, C.goldP); c(5, 9, 1, 1, C.goldP);
+    c(8, 9, 1, 1, C.goldP); c(3, 8, 1, 1, C.goldP);
+    // a little bird in the branches
+    c(8, 5, 2, 1, "#2b2f36"); c(9, 4, 1, 1, "#2b2f36"); c(10, 5, 1, 1, C.goldP);
+  }
+
   function easeOut(x) { return 1 - (1 - x) * (1 - x); }
 
   function drawPlant(p, t) {
@@ -127,7 +147,7 @@
     }
 
     switch (p.type) {
-      case "grow":   if (p.growth < 0.5) sprout(c); else flower(c, p.hue); break;
+      case "grow":   if (p.growth < 0.35) sprout(c); else tree(c); break;
       case "grass":  grass(c); break;
       case "sprout": sprout(c); break;
       case "flower": flower(c, p.hue); break;
