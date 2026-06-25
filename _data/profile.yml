@@ -1,0 +1,20 @@
+name: "Joon Choi"
+tagline: "Mechanical Engineering @ UC Berkeley"
+photo: "/assets/img/profile_photo.jpg"
+
+# Rotating roles for the animated, typed hero tagline.
+roles:
+  - "Roboticist"
+  - "Mechanical Engineer"
+  - "AI Researcher"
+  - "Sustainability Builder"
+
+bio: >-
+  Passionate about robotics, saving the environment, and making lives better.
+  Developing autonomous systems and sustainability initiatives to drive social impact.
+
+links:
+  - label: "GitHub"
+    href: "https://github.com/Joongeun"
+  - label: "Email"
+    href: "mailto:joon_choi@berkeley.edu"

@@ -1,0 +1,44 @@
+# --- Site settings ---
+title: "Joon Choi"
+tagline: "Mechanical Engineering @ UC Berkeley"
+description: >-
+  Joon Choi — Mechanical Engineering at UC Berkeley. Robotics, autonomous
+  systems, AI research, and sustainability initiatives for social impact.
+author: "Joon Choi"
+lang: en
+
+# Set this to your final hosting URL (e.g. https://joonchoi.pages.dev or a custom domain).
+# Leave blank during local dev.
+url: ""
+baseurl: ""
+
+# --- Integrations ---
+# Your public mapmyvisitors dashboard link. Get it from your mapmyvisitors
+# account ("Public profile" / "HTML link") and paste it here so the globe
+# click-through opens YOUR visitor counter page.
+mapmyvisitors_url: "https://mapmyvisitors.com/web/"
+
+# Cloudflare Web Analytics beacon token (privacy-first, auto bot-filtering).
+# Optional: if you enable analytics directly on the Cloudflare Pages project,
+# Cloudflare auto-injects the beacon and you can leave this blank.
+# To do it via code instead, paste the token from
+# Cloudflare dashboard > Web Analytics > your site > "JS snippet".
+cloudflare_analytics_token: ""
+
+# --- Build settings ---
+plugins:
+  - jekyll-seo-tag
+  - jekyll-sitemap
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - vendor
+  - README.md
+  - node_modules
+  - .ruby-version
+  - "*.md"
+
+# Keep the legacy Google Search Console verification file as-is.
+keep_files:
+  - google7b7516e8c9c714f1.html

@@ -1,168 +1,63 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>Joon Choi | Berkeley Mechanical Engineering</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <style>
-        :root {
-            --cal-gold: #FDB515;
-            --bg-dark: #0d1117;
-            --card-bg: #161b22;
-            --text-main: #c9d1d9;
-            --text-bright: #f0f6fc;
-            --border-color: #30363d;
-        }
+---
+layout: default
+---
 
-        /* Progress Bar */
-        .KW_progressContainer { position: fixed; top: 0; z-index: 1000; width: 100%; height: 4px; background: #222; }
-        .KW_progressBar { height: 4px; background: var(--cal-gold); width: 0%; }
+{%- assign p = site.data.profile -%}
 
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; background-color: var(--bg-dark); color: var(--text-main); margin: 0; padding: 0; line-height: 1.6; }
-        .container { max-width: 1000px; margin: 0 auto; padding: 40px 20px; }
-        header { border-bottom: 1px solid var(--border-color); padding-bottom: 40px; margin-bottom: 40px; }
-        .intro-grid { display: grid; grid-template-columns: 250px 1fr; gap: 40px; align-items: center; }
-        .profile-img { width: 100%; border-radius: 12px; border: 2px solid var(--border-color); }
-        
-        h1 { font-size: 2.5rem; color: var(--text-bright); margin: 0; }
-        .tagline { font-weight: bold; color: var(--cal-gold); font-size: 1.1rem; }
-        h2 { font-size: 1.8rem; color: var(--text-bright); border-left: 5px solid var(--cal-gold); padding-left: 15px; margin-top: 60px; }
-        
-        .project-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .project-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; transition: 0.3s; text-decoration: none; color: inherit; display: flex; flex-direction: column; justify-content: space-between; }
-        .project-card:hover { border-color: var(--cal-gold); transform: translateY(-3px); }
-        .project-card h3 { margin: 0 0 10px 0; color: var(--cal-gold); font-size: 1.1rem; }
-        
-        .btn-link { font-size: 0.8rem; font-weight: bold; color: var(--text-bright); text-transform: uppercase; border: 1px solid var(--border-color); padding: 5px 10px; border-radius: 4px; width: fit-content; margin-top: 10px; }
-        
-        footer { margin-top: 80px; padding: 40px 0; border-top: 1px solid var(--border-color); text-align: center; }
-        
-        .globe-wrapper { 
-            display: inline-block; 
-            width: 50px; /* Reduced from 160px to be very small */
-            margin-top: 20px;
-            filter: grayscale(100%); /* Makes it blend in */
-            opacity: 0.5; /* Makes it subtle */
-            transition: 0.3s;
-        }
-        
-        .globe-wrapper:hover { 
-            filter: grayscale(0%); 
-            opacity: 1; 
-            transform: scale(1.1); /* Slight pop when hovered */
-        }
-        
-        @media (max-width: 768px) { .intro-grid, .project-grid { grid-template-columns: 1fr; } }
-    </style>
-</head>
-<body>
+<span id="top"></span>
 
-<div class="KW_progressContainer"><div class="KW_progressBar" id="myBar"></div></div>
-
-<div class="container">
-    <header>
-        <div class="intro-grid">
-            <img src="profile_photo.jpg" class="profile-img">
-            <div>
-                <h1>Joon Choi</h1>
-                <p class="tagline">Mechanical Engineering @ UC Berkeley</p>
-                <p>Passionate about robotics, saving the environment, and making lives better. Developing autonomous systems and sustainability initiatives to drive social impact.</p>
-                <div style="margin-top: 20px;">
-                    <a href="https://github.com/Joongeun" style="color:var(--cal-gold); text-decoration: none; margin-right: 20px;">GitHub</a>
-                    <a href="mailto:joon_choi@berkeley.edu" style="color:var(--cal-gold); text-decoration: none;">Email</a>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <h2>Hardware & Robotics</h2>
-    <div class="project-grid">
-        <a class="project-card" href="https://github.com/Joongeun/Agrobot">
-            <h3>Agrobot</h3>
-            <p>Autonomous spherical robot for real-time agricultural site accessibility monitoring. Features LiDAR integration, PID control for Aruco marker following, and predictive path planning (pure pursuit).</p>
-            <span class="btn-link">View Code</span>
-        </a>
-        <a class="project-card" href="https://github.com/Joongeun/Modular_Hydroponics">
-            <h3>Modular Hydroponics (in progress)</h3>
-            <p>PCB schematics and CAD for modular, automated plant growth systems.</p>
-            <span class="btn-link">CAD + PCB Schematic Files</span>
-        </a>
-        <a class="project-card" href="https://github.com/Joongeun/The-Cheeze-Grater-Battlebot">
-            <h3>Combat Robot</h3>
-            <p>"The Cheeze Grater" design, documentation, and competition videos. Placed 33rd out of 96 teams at National Havoc Robot League (NHRL).</p>
-            <span class="btn-link">View Project</span>
-        </a>
-        <a class="project-card" href="https://github.com/Joongeun/Badminton-Shuttle-Launcher">
-            <h3>Badminton Shuttle Launcher</h3>
-            <p>Arduino code and circuit diagrams for a custom badminton training prototype.</p>
-            <span class="btn-link">View Project</span>
-        </a>
+<header class="hero reveal">
+  <div class="hero-bg" aria-hidden="true"></div>
+  <div class="intro-grid">
+    <div class="profile-frame">
+      <img src="{{ p.photo | relative_url }}" class="profile-img" alt="Portrait of {{ p.name }}" loading="eager" width="250" height="250">
     </div>
-
-    <h2>Software & AI Research</h2>
-    <div class="project-grid">
-        <a class="project-card" href="https://github.com/Joongeun/Multi-Agent-System-with-Human-in-the-Loop-Feedback-for-CMOS-Sizing">
-            <h3>Multi-Agent Pipeline for CMOS Sizing (EDA)</h3>
-            <p>A multi-agent pipeline with human-in-the-loop feedback to optimize CMOS sizing parameters to meet desired specs.</p>
-            <span class="btn-link">View Code</span>
-        </a>
-        <a class="project-card" href="https://github.com/Joongeun/MIT-Internship-2024">
-            <h3>MIT Climate Fact-Checker LLM Research (2024)</h3>
-            <p>Fine-tuned LLMs for climate change misinformation classification and web-scraping for gold-standard, open-source dataset generation.</p>
-            <span class="btn-link">Python Scripts</span>
-        </a>
-        <a class="project-card" href="https://github.com/Joongeun/IUPUI-Internship-2023">
-            <h3>IUPUI Vaping-Cessation Bioinformatics/ML Research</h3>
-            <p>Machine learning and analysis for vaping-cessation research.</p>
-            <span class="btn-link">Python Scripts and Publication Link</span>
-        </a>
-        <a class="project-card" href="https://github.com/Joongeun/cal_gym_crowd_meter_scraper">
-            <h3>UC Berkeley Gym Capacity Scraper</h3>
-            <p>Automated RSF Gym capacity monitoring using Python and GitHub Action workflows.</p>
-            <span class="btn-link">View Code</span>
-        </a>
-        <a class="project-card" href="https://github.com/Joongeun/2024-MIT-Blueprint-Hackathon-Web-Development">
-            <h3>MIT Blueprint Hackathon (2024) Website</h3>
-            <p>HTML, CSS, JS Codes</p>
-            <span class="btn-link">View Code</span>
-        </a>
+    <div class="intro-text">
+      <h1 class="glitch" data-text="{{ p.name }}">{{ p.name }}</h1>
+      <p class="tagline">
+        <span class="prompt-mark">&gt;</span>
+        <span id="typed-role" class="typed-role"></span><span class="caret">_</span>
+      </p>
+      <p class="bio">{{ p.bio }}</p>
+      <nav class="links">
+        {%- for link in p.links -%}
+          <a href="{{ link.href }}" class="link-pill"{% if link.href contains 'http' %} target="_blank" rel="noopener"{% endif %}>{{ link.label }}</a>
+        {%- endfor -%}
+      </nav>
     </div>
+  </div>
+</header>
 
-    <h2>Social Impact</h2>
-    <div class="project-grid" style="grid-template-columns: 1fr;">
-        <a class="project-card" href="https://news.berkeley.edu/2026/02/13/wildfire-safety-to-move-out-waste-uc-berkeley-students-pitch-fixes-for-top-city-problems/">
-            <div>
-                <h3>ReMove (University Move-Out Waste Mitigation Startup)</h3>
-                <p>Winner of UC Berkeley's Civic Innovation Challenge (selected by Mayor Ishii, Chancellor Lyons, and CA CTO Vera Zakem) and Big Ideas Contest Finalist. We develop comprehensive, end-to-end circular economy solutions and partnerships to mitigate illegal dumping. Featured in Berkeley News.</p>
-            </div>
-            <span class="btn-link">Read the News Article</span>
+{%- for section in site.data.projects -%}
+  <section class="section reveal" id="{{ section.id }}">
+    <h2>{{ section.title }}</h2>
+    <div class="project-grid{% if section.columns == 1 %} single{% endif %}">
+      {%- for item in section.items -%}
+        <a class="project-card reveal" href="{{ item.href }}" target="_blank" rel="noopener">
+          <div class="card-body">
+            <h3>{{ item.name }}</h3>
+            <p>{{ item.desc }}</p>
+          </div>
+          <span class="btn-link">{{ item.cta }}</span>
         </a>
-        <a class="project-card" href="https://winchesternews.org/turning-waste-into-impact-winchester-high-schools-cafeteria-waste-recycling-program-a-success/">
-            <div>
-                <h3>Winchester High School Cafeteria Waste Recycling Program</h3>
-                <p>Spearheaded initiative with potential to divert up to 20,000 lbs of food waste annually, alongside the transfer station, school administration, town's Climate Action Advisory Committee, and student government. Commended by the Massachusetts Department of Environmental Protection's School Waste Reduction and Diversion Working Group as a successful case study and scalable model for other schools.</p>
-            </div>
-            <span class="btn-link">Read the News Article</span>
-        </a>
+      {%- endfor -%}
     </div>
+  </section>
+{%- endfor -%}
 
-    <footer>
-        <p style="font-size: 0.8rem; opacity: 0.6;">&copy; 2026 Joon Choi | Berkeley Mechanical Engineering</p>
-        
-        <div class="globe-wrapper">
-            <script type="text/javascript" id="mmvst_globe" src="//mapmyvisitors.com/globe.js?d=H3VH_EyyM88uU7JrbiTEU4auPfVvP8lBdYsCzL19htE"></script>
-        </div>
-    </footer>
-</div>
-
-<script>
-    window.onscroll = function() {
-        var winScroll = document.body.scrollTop || document.documentElement.scrollTop;
-        var height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-        var scrolled = (winScroll / height) * 100;
-        document.getElementById("myBar").style.width = scrolled + "%";
-    };
-</script>
-
-</body>
-</html>
+<footer class="reveal">
+  <p class="copyright">&copy; {{ 'now' | date: "%Y" }} {{ p.name }} | Berkeley Mechanical Engineering</p>
+  <div class="visitor-map">
+    {%- comment -%}
+      The globe.js script registers each visit (the counter keeps working).
+      Its own click target points at mapmyvisitors.com, which is why it felt
+      "broken" — so we wrap it in an explicit link to YOUR public stats page.
+      Set `mapmyvisitors_url` in _config.yml to your dashboard link.
+    {%- endcomment -%}
+    <a href="{{ site.mapmyvisitors_url | default: 'https://mapmyvisitors.com/web/' }}"
+       target="_blank" rel="noopener" class="globe-wrapper" title="View visitor map &amp; counter">
+      <script type="text/javascript" id="mmvst_globe" src="//mapmyvisitors.com/globe.js?d=H3VH_EyyM88uU7JrbiTEU4auPfVvP8lBdYsCzL19htE"></script>
+    </a>
+    <a class="visitor-link" href="{{ site.mapmyvisitors_url | default: 'https://mapmyvisitors.com/web/' }}" target="_blank" rel="noopener">visitor map &amp; counter</a>
+  </div>
+</footer>

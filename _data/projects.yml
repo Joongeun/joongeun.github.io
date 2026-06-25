@@ -1,0 +1,82 @@
+# Each section becomes an <h2> + grid of project cards.
+# columns: 2 (default) or 1 (full-width, used for narrative entries).
+- title: "Hardware & Robotics"
+  id: "hardware"
+  nav: "Hardware"
+  columns: 2
+  items:
+    - name: "Agrobot"
+      href: "https://github.com/Joongeun/Agrobot"
+      desc: >-
+        Autonomous spherical robot for real-time agricultural site accessibility
+        monitoring. Features LiDAR integration, PID control for Aruco marker
+        following, and predictive path planning (pure pursuit).
+      cta: "View Code"
+    - name: "Modular Hydroponics (in progress)"
+      href: "https://github.com/Joongeun/Modular_Hydroponics"
+      desc: "PCB schematics and CAD for modular, automated plant growth systems."
+      cta: "CAD + PCB Schematic Files"
+    - name: "Combat Robot"
+      href: "https://github.com/Joongeun/The-Cheeze-Grater-Battlebot"
+      desc: >-
+        "The Cheeze Grater" design, documentation, and competition videos.
+        Placed 33rd out of 96 teams at National Havoc Robot League (NHRL).
+      cta: "View Project"
+    - name: "Badminton Shuttle Launcher"
+      href: "https://github.com/Joongeun/Badminton-Shuttle-Launcher"
+      desc: "Arduino code and circuit diagrams for a custom badminton training prototype."
+      cta: "View Project"
+
+- title: "Software & AI Research"
+  id: "software"
+  nav: "Software & AI"
+  columns: 2
+  items:
+    - name: "Multi-Agent Pipeline for CMOS Sizing (EDA)"
+      href: "https://github.com/Joongeun/Multi-Agent-System-with-Human-in-the-Loop-Feedback-for-CMOS-Sizing"
+      desc: >-
+        A multi-agent pipeline with human-in-the-loop feedback to optimize CMOS
+        sizing parameters to meet desired specs.
+      cta: "View Code"
+    - name: "MIT Climate Fact-Checker LLM Research (2024)"
+      href: "https://github.com/Joongeun/MIT-Internship-2024"
+      desc: >-
+        Fine-tuned LLMs for climate change misinformation classification and
+        web-scraping for gold-standard, open-source dataset generation.
+      cta: "Python Scripts"
+    - name: "IUPUI Vaping-Cessation Bioinformatics/ML Research"
+      href: "https://github.com/Joongeun/IUPUI-Internship-2023"
+      desc: "Machine learning and analysis for vaping-cessation research."
+      cta: "Python Scripts and Publication Link"
+    - name: "UC Berkeley Gym Capacity Scraper"
+      href: "https://github.com/Joongeun/cal_gym_crowd_meter_scraper"
+      desc: "Automated RSF Gym capacity monitoring using Python and GitHub Action workflows."
+      cta: "View Code"
+    - name: "MIT Blueprint Hackathon (2024) Website"
+      href: "https://github.com/Joongeun/2024-MIT-Blueprint-Hackathon-Web-Development"
+      desc: "HTML, CSS, JS Codes"
+      cta: "View Code"
+
+- title: "Social Impact"
+  id: "impact"
+  nav: "Social Impact"
+  columns: 1
+  items:
+    - name: "ReMove (University Move-Out Waste Mitigation Startup)"
+      href: "https://news.berkeley.edu/2026/02/13/wildfire-safety-to-move-out-waste-uc-berkeley-students-pitch-fixes-for-top-city-problems/"
+      desc: >-
+        Winner of UC Berkeley's Civic Innovation Challenge (selected by Mayor Ishii,
+        Chancellor Lyons, and CA CTO Vera Zakem) and Big Ideas Contest Finalist.
+        We develop comprehensive, end-to-end circular economy solutions and
+        partnerships to mitigate illegal dumping. Featured in Berkeley News.
+      cta: "Read the News Article"
+    - name: "Winchester High School Cafeteria Waste Recycling Program"
+      href: "https://winchesternews.org/turning-waste-into-impact-winchester-high-schools-cafeteria-waste-recycling-program-a-success/"
+      desc: >-
+        Spearheaded initiative with potential to divert up to 20,000 lbs of food
+        waste annually, alongside the transfer station, school administration,
+        town's Climate Action Advisory Committee, and student government.
+        Commended by the Massachusetts Department of Environmental Protection's
+        School Waste Reduction and Diversion Working Group as a successful case
+        study and scalable model for other schools.
+      cta: "Read the News Article"

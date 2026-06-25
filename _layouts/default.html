@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="{{ site.lang | default: 'en' }}">
+{% include head.html %}
+<body>
+  <!-- Subtle CRT scanline overlay (purely decorative, non-interactive) -->
+  <div class="crt-overlay" aria-hidden="true"></div>
+
+  <!-- Scroll progress bar -->
+  <div class="progress-container" aria-hidden="true"><div class="progress-bar" id="progressBar"></div></div>
+
+  {% include navbar.html %}
+
+  <!-- Decorative climbing vines in the side margins (wide screens only) -->
+  <canvas class="vine vine-left" id="vine-left" aria-hidden="true"></canvas>
+  <canvas class="vine vine-right" id="vine-right" aria-hidden="true"></canvas>
+
+  <main class="container">
+    {{ content }}
+  </main>
+
+  {% include garden.html %}
+  {% include tamagotchi.html %}
+
+  <script>
+    window.__ROLES__ = [{% for r in site.data.profile.roles %}{{ r | jsonify }}{% unless forloop.last %}, {% endunless %}{% endfor %}];
+  </script>
+  <script src="{{ '/assets/js/main.js' | relative_url }}" defer></script>
+  <script src="{{ '/assets/js/garden.js' | relative_url }}" defer></script>
+  <script src="{{ '/assets/js/tamagotchi.js' | relative_url }}" defer></script>
+</body>
+</html>

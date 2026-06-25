@@ -1,0 +1,8 @@
+<nav class="navbar" id="navbar">
+  <a href="#top" class="nav-brand">{{ site.data.profile.name }}</a>
+  <ul class="nav-links">
+    {%- for section in site.data.projects -%}
+      <li><a href="#{{ section.id }}" class="nav-link" data-target="{{ section.id }}">{{ section.nav | default: section.title }}</a></li>
+    {%- endfor -%}
+  </ul>
+</nav>
