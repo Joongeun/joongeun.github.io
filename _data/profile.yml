@@ -4,10 +4,10 @@ photo: "/assets/img/profile_photo.jpg"
 
 # Rotating roles for the animated, typed hero tagline.
 roles:
-  - "Roboticist"
   - "Mechanical Engineer"
-  - "AI Researcher"
-  - "Sustainability Builder"
+  - "Social Entrepreneur"
+  - "Environmental Advocate"
+  - "Robot-Lover"
 
 bio: >-
   Passionate about robotics, saving the environment, and making lives better.

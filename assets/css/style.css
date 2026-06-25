@@ -244,13 +244,13 @@ footer { margin-top: 90px; padding: 40px 0 0; border-top: 1px solid var(--border
   border: 6px solid transparent; border-top-color: var(--cal-gold);
 }
 
-/* ---------- Visitor map widget ---------- */
+/* ---------- Visitor map widget (shrunk to a small icon) ---------- */
 .visitor-map {
-  display: inline-block; margin-top: 18px; max-width: 280px;
-  opacity: 0.78; transition: opacity 0.3s ease;
+  display: inline-block; margin-top: 18px; width: 44px; line-height: 0;
+  opacity: 0.55; transition: opacity 0.3s ease, transform 0.3s ease;
 }
-.visitor-map:hover { opacity: 1; }
-.visitor-map img, .visitor-map canvas { max-width: 100%; height: auto; border-radius: 6px; }
+.visitor-map:hover { opacity: 1; transform: scale(1.15); }
+.visitor-map img, .visitor-map canvas { width: 100%; height: auto; border-radius: 4px; }
 
 /* ---------- Owner-only step-1 counter badge (shown with ?eggstats) ---------- */
 .egg-stats-badge {
