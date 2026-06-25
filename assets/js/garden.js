@@ -105,13 +105,29 @@
   }
   placePlants();
 
+  function easeOut(x) { return 1 - (1 - x) * (1 - x); }
+
   function drawPlant(p, t) {
     var ctx = p.ctx;
     ctx.clearRect(0, 0, p.el.width, p.el.height);
     var amp = reduced ? 0 : 2.2;
     var sway = Math.sin(t * 0.0013 + p.phase) * amp;
     var c = makeCell(ctx, p.Hg, sway);
+
+    // Growing plant (planted via the seed packet): rise from the ground over ~3s.
+    var growScaled = false;
+    if (p.growth != null) {
+      p.growth = reduced ? 1 : Math.min(1, (t - p.growthStart) / 3000);
+      var g = easeOut(p.growth);
+      ctx.save();
+      ctx.translate(0, p.el.height);
+      ctx.scale(1, g);
+      ctx.translate(0, -p.el.height);
+      growScaled = true;
+    }
+
     switch (p.type) {
+      case "grow":   if (p.growth < 0.5) sprout(c); else flower(c, p.hue); break;
       case "grass":  grass(c); break;
       case "sprout": sprout(c); break;
       case "flower": flower(c, p.hue); break;
@@ -127,25 +143,85 @@
         flytrap(c, p.open);
         break;
     }
+    if (growScaled) ctx.restore();
   }
 
   /* ---------- Falling autumn leaves in the side margins (New England fall) ---------- */
   var leafCanvas = document.getElementById("leaves");
   var lctx = leafCanvas ? leafCanvas.getContext("2d") : null;
+  var TAU = Math.PI * 2;
 
-  var LEAF_COLORS = ["#d2451e", "#e8731c", "#f0a826", "#c9302c", "#a8531c", "#e0b020", "#b5471f"];
-  // 9x9 maple-leaf silhouette (stem at the bottom).
-  var LEAF_BMP = [
-    "000100000",
-    "100100010",
-    "010101100",
-    "001111000",
-    "111111110",
-    "000111000",
-    "001010100",
-    "000010000",
-    "000010000"
-  ].map(function (row) { return row.split("").map(function (ch) { return ch === "1"; }); });
+  // Pre-rendered smooth vector leaf sprites (built once). Each = species x palette.
+  var LEAF_S = 44; // logical sprite box
+  var SPECIES = [
+    { r: function (th) { return 0.50 + 0.50 * Math.pow(Math.abs(Math.cos(2.5 * th)), 0.35); }, stretch: 1.00 }, // maple (5 lobes)
+    { r: function (th) { return 0.80 + 0.20 * Math.cos(7 * th); }, stretch: 1.12 },                              // oak (scalloped)
+    { r: function (th) { return 0.86 + 0.14 * Math.cos(2 * th); }, stretch: 1.28 }                               // birch (ovate)
+  ];
+  var PALETTES = [
+    { base: "#7a1f12", mid: "#c9302c", tip: "#f0a826", vein: "#5a1408", hi: "#ffd9a0" },
+    { base: "#8a3b0f", mid: "#e8731c", tip: "#f7c948", vein: "#5e2606", hi: "#ffe6b0" },
+    { base: "#7d5a10", mid: "#e0b020", tip: "#f4e08a", vein: "#553f08", hi: "#fff2c0" },
+    { base: "#6e1410", mid: "#b5471f", tip: "#d98a2b", vein: "#4a0d08", hi: "#ffd9a0" }
+  ];
+
+  function leafPath(o, S, spec) {
+    var cx = S / 2, cy = S * 0.46, R = S * 0.40, steps = 56;
+    o.beginPath();
+    for (var i = 0; i <= steps; i++) {
+      var th = (i / steps) * TAU - Math.PI / 2;          // start at the tip (up)
+      var rr = R * spec.r(th);
+      var x = cx + Math.cos(th) * rr;
+      var y = cy + Math.sin(th) * rr * spec.stretch;
+      if (i === 0) o.moveTo(x, y); else o.lineTo(x, y);
+    }
+    o.closePath();
+    return { cx: cx, cy: cy, R: R, stretch: spec.stretch };
+  }
+
+  function makeSprite(spec, pal) {
+    var q = 3, S = LEAF_S;                                // supersample for smooth edges
+    var cv = document.createElement("canvas");
+    cv.width = S * q; cv.height = S * q;
+    var o = cv.getContext("2d");
+    o.scale(q, q);
+    // body with gradient + soft drop shadow
+    o.save();
+    o.shadowColor = "rgba(0,0,0,0.28)"; o.shadowBlur = 3; o.shadowOffsetY = 1.5;
+    var g = o.createLinearGradient(0, S * 0.86, 0, S * 0.06);
+    g.addColorStop(0, pal.base); g.addColorStop(0.55, pal.mid); g.addColorStop(1, pal.tip);
+    o.fillStyle = g;
+    var m = leafPath(o, S, spec);
+    o.fill();
+    o.restore();
+    // veins (midrib + branches)
+    o.strokeStyle = pal.vein; o.lineWidth = 1; o.lineCap = "round";
+    var bottom = m.cy + m.R * m.stretch, top = m.cy - m.R * m.stretch;
+    o.beginPath();
+    o.moveTo(m.cx, bottom * 0.96); o.lineTo(m.cx, top + 2);
+    [0.66, 0.5, 0.36].forEach(function (f) {
+      var yy = m.cy + (bottom - m.cy) * (f - 0.0) - (bottom - m.cy) * 0.0;
+      var vy = m.cy - (m.cy - top) * (1 - f);
+      o.moveTo(m.cx, vy); o.lineTo(m.cx - m.R * 0.5 * f, vy - m.R * 0.22);
+      o.moveTo(m.cx, vy); o.lineTo(m.cx + m.R * 0.5 * f, vy - m.R * 0.22);
+    });
+    o.stroke();
+    // stem
+    o.strokeStyle = pal.vein; o.lineWidth = 1.6;
+    o.beginPath(); o.moveTo(m.cx, bottom * 0.96); o.lineTo(m.cx, S - 2); o.stroke();
+    // soft highlight
+    o.globalAlpha = 0.18;
+    var hg = o.createRadialGradient(m.cx - m.R * 0.25, top + m.R * 0.4, 1, m.cx, m.cy, m.R);
+    hg.addColorStop(0, pal.hi); hg.addColorStop(1, "rgba(255,255,255,0)");
+    o.fillStyle = hg; leafPath(o, S, spec); o.fill();
+    o.globalAlpha = 1;
+    return { canvas: cv, S: S };
+  }
+
+  var SPRITES = [];
+  for (var si = 0; si < SPECIES.length; si++) {
+    for (var pi = 0; pi < PALETTES.length; pi++) SPRITES.push(makeSprite(SPECIES[si], PALETTES[pi]));
+  }
 
   var leaves = [], leafW = 0, leafH = 0;
   var CONTENT_HALF = 500; // half of the 1000px content column
@@ -157,24 +233,33 @@
     var gw = gutter();
     var side = Math.random() < 0.5 ? -1 : 1;            // -1 left margin, +1 right
     var lx = 8 + Math.random() * Math.max(2, gw - 16);  // x within the margin
+    le.burst = false;
     le.side = side;
     le.x = side < 0 ? lx : leafW - lx;
     le.y = atTop ? -16 - Math.random() * 80 : Math.random() * leafH;
     le.vy = 0.45 + Math.random() * 0.9;
     le.vx = side * (0.05 + Math.random() * 0.3);         // drift outward, toward the edge
     le.sway = 0.4 + Math.random() * 0.9;
-    le.phase = Math.random() * Math.PI * 2;
-    le.angle = Math.random() * Math.PI * 2;
-    le.spin = (Math.random() - 0.5) * 0.04;
-    le.scale = 0.85 + Math.random() * 0.8;
-    le.color = LEAF_COLORS[(Math.random() * LEAF_COLORS.length) | 0];
+    le.phase = Math.random() * TAU;
+    le.angle = Math.random() * TAU;
+    le.spin = (Math.random() - 0.5) * 0.02;             // slower for smoothness
+    le.tumblePhase = Math.random() * TAU;
+    le.tumbleRate = 0.6 + Math.random() * 0.8;
+    le.scale = (16 + Math.random() * 14) / LEAF_S;      // ~16-30px on screen
+    le.alpha = 0.82 + Math.random() * 0.18;
+    le.sprite = (Math.random() * SPRITES.length) | 0;
     return le;
   }
 
   function initLeaves() {
     if (!leafCanvas) return;
-    leafW = leafCanvas.width = window.innerWidth;
-    leafH = leafCanvas.height = window.innerHeight;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    leafW = window.innerWidth; leafH = window.innerHeight;
+    leafCanvas.width = Math.round(leafW * dpr);
+    leafCanvas.height = Math.round(leafH * dpr);
+    leafCanvas.style.width = leafW + "px";
+    leafCanvas.style.height = leafH + "px";
+    lctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     leaves = [];
     if (reduced) return;                                 // honor reduced-motion: no falling leaves
     var gw = gutter();
@@ -190,25 +275,84 @@
   }, { passive: true });
 
   function drawLeaf(le) {
+    var sp = SPRITES[le.sprite];
     lctx.save();
     lctx.translate(le.x, le.y);
     lctx.rotate(le.angle);
-    var p = 2 * le.scale, s = Math.ceil(p);
-    lctx.fillStyle = le.color;
-    for (var r = 0; r < 9; r++) {
-      for (var c = 0; c < 9; c++) {
-        if (LEAF_BMP[r][c]) lctx.fillRect(Math.round((c - 4) * p), Math.round((r - 4) * p), s, s);
-      }
-    }
+    var flip = Math.cos(le.phase * le.tumbleRate + le.tumblePhase); // +1..-1 fakes the 3D edge-on flip
+    lctx.scale(le.scale * flip, le.scale);
+    lctx.globalAlpha = le.alpha;
+    lctx.drawImage(sp.canvas, -sp.S / 2, -sp.S / 2, sp.S, sp.S);
     lctx.restore();
   }
 
+  // returns false when a burst leaf should be removed
   function updateLeaf(le) {
+    if (le.burst) {
+      le.vy += 0.12;                                     // gravity
+      le.x += le.vx; le.y += le.vy;
+      le.angle += le.spin; le.phase += 0.04;
+      return le.y < leafH + 40 && le.x > -40 && le.x < leafW + 40;
+    }
     le.y += le.vy;
     le.phase += 0.02;
     le.x += le.vx + Math.sin(le.phase) * le.sway;
     le.angle += le.spin;
     if (le.y > leafH + 24 || le.x < -24 || le.x > leafW + 24) seed(le, true);
+    return true;
+  }
+
+  /* ---------- Easter-egg event hooks ---------- */
+  document.addEventListener("garden:flytrap-snap", function () {
+    for (var i = 0; i < plants.length; i++) {
+      if (plants[i].type === "flytrap") { plants[i].open = 0; plants[i].snapT = 0; }
+    }
+  });
+
+  document.addEventListener("garden:plant", function (e) {
+    spawnGrowingPlant(e.detail && e.detail.x);
+  });
+
+  document.addEventListener("leaves:burst", function (e) {
+    if (reduced || !lctx) return;
+    var d = e.detail || {};
+    burstLeaves(d.x != null ? d.x : leafW / 2, d.y != null ? d.y : leafH - 40, d.n || 24);
+  });
+
+  function spawnGrowingPlant(clientX) {
+    var garden = document.querySelector(".garden");
+    if (!garden) return;
+    var cv = document.createElement("canvas");
+    cv.className = "plant"; cv.width = 48; cv.height = 80;
+    garden.appendChild(cv);
+    var leftPct = clientX != null
+      ? Math.max(1, Math.min(99, (clientX / window.innerWidth) * 100))
+      : Math.random() * 100;
+    cv.style.left = leftPct + "%";
+    plants.push({
+      el: cv, ctx: cv.getContext("2d"), type: "grow",
+      hue: Math.random() < 0.5 ? "gold" : "pink",
+      leftPct: leftPct, Hg: cv.height / PX, Wg: cv.width / PX,
+      phase: leftPct * 0.7, open: 0.8, nextSnap: 0, snapT: 0,
+      growth: 0, growthStart: performance.now()
+    });
+  }
+
+  function burstLeaves(x, y, n) {
+    for (var i = 0; i < n; i++) {
+      var ang = -Math.PI / 2 + (Math.random() - 0.5) * Math.PI; // upward fan
+      var spd = 2 + Math.random() * 4.5;
+      leaves.push({
+        burst: true,
+        x: x + (Math.random() - 0.5) * 30, y: y + (Math.random() - 0.5) * 20,
+        vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd,
+        sway: 0, phase: Math.random() * TAU,
+        angle: Math.random() * TAU, spin: (Math.random() - 0.5) * 0.25,
+        tumblePhase: Math.random() * TAU, tumbleRate: 0.6 + Math.random() * 0.8,
+        scale: (16 + Math.random() * 14) / LEAF_S, alpha: 1,
+        sprite: (Math.random() * SPRITES.length) | 0
+      });
+    }
   }
 
   /* ---------- Loop ---------- */
@@ -216,7 +360,10 @@
     plants.forEach(function (p) { drawPlant(p, t); });
     if (lctx && leaves.length) {
       lctx.clearRect(0, 0, leafW, leafH);
-      for (var i = 0; i < leaves.length; i++) { updateLeaf(leaves[i]); drawLeaf(leaves[i]); }
+      for (var i = leaves.length - 1; i >= 0; i--) {
+        if (!updateLeaf(leaves[i])) { leaves.splice(i, 1); continue; }
+        drawLeaf(leaves[i]);
+      }
     }
     requestAnimationFrame(frame);
   }

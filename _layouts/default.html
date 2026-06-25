@@ -19,6 +19,7 @@
 
   {% include garden.html %}
   {% include tamagotchi.html %}
+  {% include easteregg.html %}
 
   <script>
     window.__ROLES__ = [{% for r in site.data.profile.roles %}{{ r | jsonify }}{% unless forloop.last %}, {% endunless %}{% endfor %}];
@@ -26,5 +27,6 @@
   <script src="{{ '/assets/js/main.js' | relative_url }}" defer></script>
   <script src="{{ '/assets/js/garden.js' | relative_url }}" defer></script>
   <script src="{{ '/assets/js/tamagotchi.js' | relative_url }}" defer></script>
+  <script src="{{ '/assets/js/easteregg.js' | relative_url }}" defer></script>
 </body>
 </html>

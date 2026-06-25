@@ -84,6 +84,30 @@
       cell(9, 13, 2, 3, COL.dark);
     }
 
+    // ---- Easter-egg upgrades (centered/symmetric so they survive the facing flip) ----
+    if (upgradeLevel >= 2) {
+      // angel wings beside the body
+      cell(2, 8, 2, 1, "#eef3f8"); cell(1, 9, 3, 1, "#eef3f8"); cell(2, 10, 2, 1, "#eef3f8");
+      cell(12, 8, 2, 1, "#eef3f8"); cell(13, 9, 3, 1, "#eef3f8"); cell(12, 10, 2, 1, "#eef3f8");
+    }
+    if (upgradeLevel >= 1) {
+      // glowing cross emblem on the chest
+      ctx.save();
+      ctx.shadowColor = COL.gold; ctx.shadowBlur = 6;
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(31, 35, 2, 11);   // vertical bar
+      ctx.fillRect(27, 38, 10, 2);   // horizontal bar
+      ctx.restore();
+    }
+    if (upgradeLevel >= 3) {
+      // floating halo above the head
+      ctx.save();
+      ctx.shadowColor = COL.gold; ctx.shadowBlur = 8;
+      ctx.strokeStyle = COL.gold; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.ellipse(32, 4, 9, 2.6, 0, 0, Math.PI * 2); ctx.stroke();
+      ctx.restore();
+    }
+
     ctx.restore();
   }
 
@@ -102,6 +126,11 @@
   var lastMouseMove = 0;
   var nextWander = 2000;
   var nextChatter = 9000;
+
+  // Easter-egg upgrade state (driven by robot:* CustomEvents from easteregg.js).
+  var upgradeLevel = 0;
+  var spinStart = 0, spinUntil = 0;
+  var buddyCanvas = null, buddyCtx = null, buddyX = 0;
 
   var MESSAGES = [
     "beep boop!", "hi there!", "nice work!", "need a hand?",
@@ -130,6 +159,46 @@
     happyUntil = performance.now() + 1500;
     hopStart = performance.now();
     say(MESSAGES[(Math.floor(performance.now() / 137)) % MESSAGES.length]);
+  });
+
+  /* ---------- Companion bot (upgrade level 3) ---------- */
+  function ensureCompanion() {
+    if (upgradeLevel >= 3 && !buddyCanvas) {
+      buddyCanvas = document.createElement("canvas");
+      buddyCanvas.id = "tama-buddy";
+      buddyCanvas.width = 40; buddyCanvas.height = 40;
+      buddyCanvas.setAttribute("aria-hidden", "true");
+      document.body.appendChild(buddyCanvas);
+      buddyCtx = buddyCanvas.getContext("2d");
+      buddyCtx.imageSmoothingEnabled = false;
+      buddyX = x - 30;
+    } else if (upgradeLevel < 3 && buddyCanvas) {
+      buddyCanvas.remove(); buddyCanvas = null; buddyCtx = null;
+    }
+  }
+
+  function drawBuddy() {
+    var c2 = buddyCtx, px = 2, ox = 4, oy = 4; // 16-grid * 2 = 32, centered in 40
+    function k(gx, gy, w, h, col) { c2.fillStyle = col; c2.fillRect(ox + gx * px, oy + gy * px, w * px, h * px); }
+    c2.clearRect(0, 0, 40, 40);
+    c2.fillStyle = "rgba(0,0,0,0.25)";
+    c2.beginPath(); c2.ellipse(20, 38, 9, 2, 0, 0, Math.PI * 2); c2.fill();
+    k(8, 0, 1, 1, COL.gold); k(8, 1, 1, 1, COL.dark);            // antenna
+    k(5, 2, 6, 5, COL.body); k(10, 2, 1, 5, COL.dark); k(5, 3, 5, 2, COL.face); // head
+    k(6, 3, 1, 1, COL.gold); k(9, 3, 1, 1, COL.gold); k(7, 4, 2, 1, COL.mouth); // face
+    k(4, 8, 8, 4, COL.body); k(11, 8, 1, 4, COL.dark); k(7, 9, 2, 2, COL.gold); // body
+    k(5, 12, 2, 3, COL.dark); k(9, 12, 2, 3, COL.dark);          // legs
+  }
+
+  /* ---------- Cross-module event API (dispatched by easteregg.js) ---------- */
+  document.addEventListener("robot:say", function (e) { say(e.detail.msg, e.detail.ms); });
+  document.addEventListener("robot:spin", function () {
+    if (reduced) return;
+    spinStart = performance.now(); spinUntil = spinStart + 900; happyUntil = spinUntil;
+  });
+  document.addEventListener("robot:upgrade", function (e) {
+    upgradeLevel = (e.detail && e.detail.level) | 0;
+    ensureCompanion();
   });
 
   /* ---------- Loop ---------- */
@@ -166,13 +235,24 @@
 
     draw({ facing: facing, legPhase: legPhase, eyes: eyes });
 
-    // Position + hop.
+    // Position + hop + (gateway) spin.
     var hopY = 0;
     if (happy) {
       var hp = (t - hopStart) / 1500;
       hopY = -Math.abs(Math.sin(hp * Math.PI * 3)) * 14 * (1 - hp);
     }
-    root.style.transform = "translateX(" + x + "px) translateY(" + hopY + "px)";
+    var spin = "";
+    if (t < spinUntil) { spin = " rotate(" + (((t - spinStart) / 900) * 360) + "deg)"; }
+    root.style.transform = "translateX(" + x + "px) translateY(" + hopY + "px)" + spin;
+
+    // Companion bot eases along behind the main robot.
+    if (buddyCanvas) {
+      var bt = x - 30;
+      buddyX += (bt - buddyX) * (reduced ? 1 : 0.06);
+      drawBuddy();
+      var bhopY = reduced ? 0 : Math.sin(t * 0.004) * 2;
+      buddyCanvas.style.transform = "translateX(" + buddyX + "px) translateY(" + bhopY + "px)";
+    }
 
     requestAnimationFrame(frame);
   }

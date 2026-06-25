@@ -270,7 +270,77 @@ footer { margin-top: 90px; padding: 40px 0 0; border-top: 1px solid var(--border
 /* ---------- Falling autumn leaves (side margins) ---------- */
 .leaves {
   position: fixed; inset: 0; width: 100vw; height: 100vh;
-  z-index: 3; pointer-events: none; image-rendering: pixelated;
+  z-index: 3; pointer-events: none;
+}
+
+/* ---------- Easter-egg: companion bot ---------- */
+#tama-buddy {
+  position: fixed; bottom: 0; left: 0; z-index: 8999;
+  width: 40px; height: 40px; pointer-events: none;
+  image-rendering: pixelated; will-change: transform;
+}
+
+/* ---------- Easter-egg: seed packet + drag ghost ---------- */
+.seed-packet {
+  position: fixed; bottom: 96px; left: 16px; z-index: 9001;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: 8px 10px; cursor: grab; touch-action: none;
+  background: var(--card-bg); color: var(--cal-gold);
+  border: 2px solid var(--cal-gold); border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.45), 0 0 12px var(--cal-gold-soft);
+  font-family: var(--pixel-font); font-size: 0.5rem; line-height: 1.4;
+  animation: seedBob 2.4s ease-in-out infinite;
+}
+.seed-packet[hidden] { display: none; }
+.seed-packet:hover { transform: translateY(-2px); }
+.seed-packet.dragging { cursor: grabbing; opacity: 0.4; }
+.seed-packet-icon { font-size: 1.1rem; line-height: 1; }
+@keyframes seedBob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+.seed-ghost {
+  position: fixed; z-index: 9002; pointer-events: none;
+  font-size: 1.6rem; transform: translate(-50%, -50%);
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+}
+.plant.eg-armed { pointer-events: auto; cursor: pointer; }
+
+/* ---------- Easter-egg: CRT verse overlay ---------- */
+.verse-overlay {
+  position: fixed; inset: 0; z-index: 10000;
+  display: flex; align-items: center; justify-content: center; padding: 24px;
+  background: rgba(5, 7, 10, 0.82);
+  opacity: 0; visibility: hidden; pointer-events: none;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+.verse-overlay.open { opacity: 1; visibility: visible; pointer-events: auto; }
+.verse-card {
+  position: relative; max-width: 520px; width: 100%;
+  background: var(--card-bg); color: var(--text-bright);
+  border: 2px solid var(--cal-gold); border-radius: 10px;
+  padding: 28px 26px 20px; text-align: center; overflow: hidden;
+  box-shadow: 0 0 0 1px var(--cal-gold-soft), 0 20px 60px rgba(0,0,0,0.6), 0 0 40px var(--cal-gold-soft);
+  transform: translateY(12px) scale(0.97); transition: transform 0.25s ease;
+}
+.verse-overlay.open .verse-card { transform: none; }
+.verse-card::before { /* scanlines */
+  content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0.5;
+  background: repeating-linear-gradient(to bottom, rgba(0,0,0,0) 0, rgba(0,0,0,0) 2px, rgba(0,0,0,0.16) 3px, rgba(0,0,0,0) 4px);
+}
+.verse-ref {
+  font-family: var(--pixel-font); font-size: 0.85rem; color: var(--cal-gold);
+  margin-bottom: 18px; letter-spacing: 0.5px;
+}
+.verse-text { font-family: var(--mono-font); font-size: 1rem; line-height: 1.7; margin: 0 0 18px; }
+.verse-upgrade { font-family: var(--mono-font); font-size: 0.8rem; color: var(--cal-gold); margin-bottom: 20px; }
+.verse-close {
+  font-family: var(--mono-font); font-size: 0.85rem; font-weight: 700;
+  color: var(--cal-gold); background: transparent; cursor: pointer;
+  padding: 8px 18px; border: 1px solid var(--cal-gold); border-radius: 6px;
+  transition: all 0.2s ease;
+}
+.verse-close:hover { background: var(--cal-gold); color: var(--bg-dark); }
+.verse-attrib {
+  margin-top: 18px; font-family: var(--mono-font); font-size: 0.6rem;
+  line-height: 1.5; color: var(--text-dim); opacity: 0.75;
 }
 
 /* ---------- Responsive ---------- */
