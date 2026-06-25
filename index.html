@@ -47,8 +47,18 @@ layout: default
 
 <footer class="reveal">
   <p class="copyright">&copy; {{ 'now' | date: "%Y" }} {{ p.name }} | Berkeley Mechanical Engineering</p>
-  <div class="visitor-map" title="Visitor map">
-    <!-- mapmyvisitors map widget (stats at https://mapmyvisitors.com/web/1c5fj) -->
-    <script type="text/javascript" id="mapmyvisitors" src="//mapmyvisitors.com/map.js?d=2PXi1FlaM5QtE5um1GtJuIw1tUsNsgw3P5Xg_U7YSiQ&cl=ffffff&w=a"></script>
+  <div class="visitor-map">
+    <!-- Clean globe icon that links to the visitor map/stats page. -->
+    <a href="{{ site.mapmyvisitors_url | default: 'https://mapmyvisitors.com/web/1c5fj' }}"
+       target="_blank" rel="noopener" class="visitor-icon" title="Visitor map" aria-label="Visitor map">
+      <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor"
+           stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="9"></circle>
+        <line x1="3" y1="12" x2="21" y2="12"></line>
+        <path d="M12 3c3 3.2 3 14.8 0 18 -3 -3.2 -3 -14.8 0 -18Z"></path>
+      </svg>
+    </a>
+    <!-- Hidden tracking pixel: loading map.png registers each visit (no visible map/number). -->
+    <img class="visitor-pixel" src="//mapmyvisitors.com/map.png?d=2PXi1FlaM5QtE5um1GtJuIw1tUsNsgw3P5Xg_U7YSiQ&cl=ffffff" alt="" aria-hidden="true" width="1" height="1">
   </div>
 </footer>
