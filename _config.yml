@@ -9,7 +9,7 @@ lang: en
 
 # Set this to your final hosting URL (e.g. https://joonchoi.pages.dev or a custom domain).
 # Leave blank during local dev.
-url: ""
+url: "https://joon-choi.pages.dev"
 baseurl: ""
 
 # --- Integrations ---
