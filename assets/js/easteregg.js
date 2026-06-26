@@ -18,26 +18,29 @@
   /* ---------- State (in-memory only: the journey resets on every page load) ---------- */
   var state = { gateway: false, stage1: false, stage2: false, stage3: false, upgrade: 0 };
 
-  /* ---------- Step-1 counter (owner-only metric) ----------
+  /* ---------- Per-step counters (owner-only metric) ----------
    * Pings a Cloudflare Pages Function (/api/egg) the first time a given browser
-   * solves step 1 (the Konami code). A tiny separate localStorage flag dedupes so
-   * each person is counted once — it does NOT restore game progress. View the tally
-   * by opening the site with ?eggstats (or GET /api/egg). No-ops if the endpoint
-   * isn't deployed yet, so it's harmless locally. */
-  var METRIC_KEY = "joon_egg_metric_v1";
-  function recordStep1() {
+   * solves each step. A tiny separate localStorage flag per step dedupes so each
+   * person is counted once per step — it does NOT restore game progress. View the
+   * tallies by opening the site with ?eggstats (or GET /api/egg). No-ops if the
+   * endpoint isn't deployed yet, so it's harmless locally. */
+  function recordStep(step) {
+    var key = "joon_egg_metric_v1_s" + step;
     var done = false;
-    try { done = localStorage.getItem(METRIC_KEY) === "1"; } catch (e) {}
+    try { done = localStorage.getItem(key) === "1"; } catch (e) {}
     if (done) return;
-    try { localStorage.setItem(METRIC_KEY, "1"); } catch (e) {}
-    try { fetch("/api/egg", { method: "POST", keepalive: true }).catch(function () {}); } catch (e) {}
+    try { localStorage.setItem(key, "1"); } catch (e) {}
+    try { fetch("/api/egg?step=" + step, { method: "POST", keepalive: true }).catch(function () {}); } catch (e) {}
   }
   function showStatsBadge() {
     if (!/[?&]eggstats\b/.test(location.search)) return;
     fetch("/api/egg").then(function (r) { return r.json(); }).then(function (d) {
+      function n(v) { return v != null ? v : "?"; }
       var b = document.createElement("div");
       b.className = "egg-stats-badge";
-      b.textContent = "🥚 step 1 solved by " + (d && d.step1 != null ? d.step1 : "?") + " people";
+      b.textContent = "🥚 solved — step 1: " + n(d && d.step1) +
+                      " · step 2: " + n(d && d.step2) +
+                      " · step 3: " + n(d && d.step3);
       document.body.appendChild(b);
     }).catch(function () {});
   }
@@ -109,7 +112,7 @@
   function complete(stageKey, verse, level) {
     if (state[stageKey]) return;
     state[stageKey] = true;
-    if (stageKey === "stage1") recordStep1();   // count people who solve step 1
+    recordStep(stageKey.replace("stage", ""));  // count people who solve this step
     setUpgrade(level);
     showVerse(verse, advanceHints);
   }

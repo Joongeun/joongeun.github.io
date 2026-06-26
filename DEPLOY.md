@@ -58,14 +58,16 @@ to mapmyvisitors, copy your **public profile / HTML link**, and set it in
 mapmyvisitors_url: "https://mapmyvisitors.com/web/<your-id>"
 ```
 
-## Easter-egg step-1 counter (owner only)
+## Easter-egg step counters (owner only)
 
-How many visitors have solved **step 1** of the gospel-journey easter egg
-(the Konami code). Bookmark these:
+How many visitors have solved each step of the gospel-journey easter egg —
+step 1 (Konami code), step 2 (feed the flytrap), step 3 (plant the mustard
+seed). Bookmark these:
 
 - **Stats badge (on the live site):** <https://joon-choi.pages.dev/?eggstats>
-  — adds a small "🥚 step 1 solved by N people" badge to the page.
-- **Raw JSON:** <https://joon-choi.pages.dev/api/egg> — returns `{"step1":N}`.
+  — adds a small "🥚 solved — step 1: N · step 2: N · step 3: N" badge.
+- **Raw JSON:** <https://joon-choi.pages.dev/api/egg> — returns
+  `{"step1":N,"step2":N,"step3":N}`.
 
 Backed by the Cloudflare Pages Function `functions/api/egg.js` + a KV namespace
 bound as **`EGG_KV`** (Pages project → Settings → Functions → KV namespace
