@@ -9,7 +9,8 @@
   var ctx = canvas.getContext("2d");
   ctx.imageSmoothingEnabled = false;
 
-  var PX = 4; // each logical pixel = 4 canvas px (16x16 grid -> 64x64)
+  var PX = 4;  // each logical pixel = 4 canvas px (16-wide grid -> 64px)
+  var OY = 4;  // top offset (rows): pushes the robot down so the sprout has headroom
   var COL = {
     out:  "#0a0c10",
     body: "#c9d1d9",
@@ -18,25 +19,43 @@
     face: "#11151c",
     mouth:"#3a4150"
   };
+  // Optimus Prime palette (used after the transform) + sprout greens.
+  var OPT = {
+    blue: "#2f6fc0", blueD: "#1f4f8f", blueL: "#4f8fdc",
+    red:  "#c0392b", redD:  "#8f2a20",
+    sil:  "#cdd6df", silD:  "#9aa4ad",
+    win:  "#13202c", glass: "#2a6fae", eye: "#7fe0ff", glow: "#f5c542"
+  };
+  var GRN = "#3fae5a", GRN_D = "#2e8c45", BUD = "#9be86b";
 
   function cell(x, y, w, h, color) {
     ctx.fillStyle = color;
-    ctx.fillRect(x * PX, y * PX, w * PX, h * PX);
+    ctx.fillRect(x * PX, (y + OY) * PX, w * PX, h * PX);
   }
 
   // Draw the robot for a given pose. legPhase: 0|1, eyes: 'open'|'blink'|'happy'
   function draw(pose) {
-    ctx.clearRect(0, 0, 64, 64);
+    ctx.clearRect(0, 0, 64, 80);
 
     // ground shadow
     ctx.fillStyle = "rgba(0,0,0,0.28)";
     ctx.beginPath();
-    ctx.ellipse(32, 62, 14, 3, 0, 0, Math.PI * 2);
+    ctx.ellipse(32, 78, 14, 3, 0, 0, Math.PI * 2);
     ctx.fill();
 
     ctx.save();
     if (pose.facing < 0) { ctx.translate(64, 0); ctx.scale(-1, 1); }
 
+    if (isOptimus) drawOptimus(pose);
+    else drawBot(pose);
+
+    drawSprout();   // grows on the head before the transform
+
+    ctx.restore();
+  }
+
+  // ---- Default pixel robot ----
+  function drawBot(pose) {
     var armY = pose.eyes === "happy" ? 7 : 8;
 
     // antenna
@@ -83,32 +102,65 @@
       cell(5, 13, 2, 2, COL.dark);
       cell(9, 13, 2, 3, COL.dark);
     }
+  }
 
-    // ---- Easter-egg upgrades (centered/symmetric so they survive the facing flip) ----
-    if (upgradeLevel >= 2) {
-      // angel wings beside the body
-      cell(2, 8, 2, 1, "#eef3f8"); cell(1, 9, 3, 1, "#eef3f8"); cell(2, 10, 2, 1, "#eef3f8");
-      cell(12, 8, 2, 1, "#eef3f8"); cell(13, 9, 3, 1, "#eef3f8"); cell(12, 10, 2, 1, "#eef3f8");
+  // ---- Optimus Prime form (reward) ----
+  // Cues for recognizability: blue helmet + two silver side antennae, a glowing
+  // blue eye visor, a silver faceplate/mouthplate, a red chest (truck cab) with
+  // twin windshield windows + a silver grille, and blue limbs.
+  function drawOptimus(pose) {
+    // side antennae / horns
+    cell(4, 2, 1, 2, OPT.sil); cell(11, 2, 1, 2, OPT.sil);
+    // helmet
+    cell(5, 2, 6, 3, OPT.blue);
+    cell(10, 2, 1, 3, OPT.blueD);          // right shade
+    cell(6, 2, 4, 1, OPT.blueL);           // forehead highlight
+    // glowing eye visor
+    cell(6, 3, 4, 1, OPT.win);
+    cell(6, 3, 1, 1, OPT.eye); cell(9, 3, 1, 1, OPT.eye);
+    // silver faceplate / mouthplate
+    cell(6, 5, 4, 2, OPT.sil);
+    cell(9, 5, 1, 2, OPT.silD);            // shade
+    cell(7, 6, 2, 1, OPT.silD);            // mouth line
+    // neck
+    cell(7, 7, 2, 1, OPT.silD);
+    // shoulders / smokestack tips
+    cell(3, 7, 1, 1, OPT.sil); cell(12, 7, 1, 1, OPT.sil);
+    // red cab (chest)
+    cell(4, 8, 8, 3, OPT.red);
+    cell(11, 8, 1, 3, OPT.redD);           // right shade
+    // twin windshield windows (dark, faint top glint)
+    cell(5, 8, 2, 2, OPT.win); cell(9, 8, 2, 2, OPT.win);
+    cell(5, 8, 2, 1, OPT.glass); cell(9, 8, 2, 1, OPT.glass);
+    // silver grille / bumper
+    cell(4, 10, 8, 1, OPT.sil);
+    // blue abdomen
+    cell(4, 11, 8, 2, OPT.blue);
+    cell(11, 11, 1, 2, OPT.blueD);         // right shade
+    cell(4, 12, 8, 1, OPT.blueD);          // bottom shade
+    cell(7, 11, 2, 1, OPT.glow);           // belt buckle
+    // arms (blue with silver fists)
+    cell(3, 8, 1, 3, OPT.blue); cell(12, 8, 1, 3, OPT.blue);
+    cell(3, 10, 1, 1, OPT.silD); cell(12, 10, 1, 1, OPT.silD);
+    // legs (blue, walk alternation) with silver feet
+    if (pose.legPhase === 0) {
+      cell(5, 13, 2, 3, OPT.blue); cell(9, 13, 2, 2, OPT.blue);
+      cell(5, 15, 2, 1, OPT.silD); cell(9, 14, 2, 1, OPT.silD);
+    } else {
+      cell(5, 13, 2, 2, OPT.blue); cell(9, 13, 2, 3, OPT.blue);
+      cell(5, 14, 2, 1, OPT.silD); cell(9, 15, 2, 1, OPT.silD);
     }
-    if (upgradeLevel >= 1) {
-      // glowing cross emblem on the chest
-      ctx.save();
-      ctx.shadowColor = COL.gold; ctx.shadowBlur = 6;
-      ctx.fillStyle = "#ffffff";
-      ctx.fillRect(31, 35, 2, 11);   // vertical bar
-      ctx.fillRect(27, 38, 10, 2);   // horizontal bar
-      ctx.restore();
-    }
-    if (upgradeLevel >= 3) {
-      // floating halo above the head
-      ctx.save();
-      ctx.shadowColor = COL.gold; ctx.shadowBlur = 8;
-      ctx.strokeStyle = COL.gold; ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.ellipse(32, 4, 9, 2.6, 0, 0, Math.PI * 2); ctx.stroke();
-      ctx.restore();
-    }
+  }
 
-    ctx.restore();
+  // ---- Green sprout that grows on the head (the click gateway) ----
+  function drawSprout() {
+    if (sproutLevel <= 0) return;
+    var h = Math.min(sproutLevel, 4);
+    for (var s = 0; s <= h; s++) cell(8, 1 - s, 1, 1, GRN);  // stem rises from antenna spot
+    if (h >= 1) cell(7, 0, 1, 1, GRN_D);                     // leaves alternate out
+    if (h >= 2) cell(9, -1, 1, 1, GRN_D);
+    if (h >= 3) cell(7, -2, 1, 1, GRN);
+    cell(8, -h, 1, 1, BUD);                                  // bud on top
   }
 
   /* ---------- State ---------- */
@@ -127,8 +179,10 @@
   var nextWander = 2000;
   var nextChatter = 9000;
 
-  // Easter-egg upgrade state (driven by robot:* CustomEvents from easteregg.js).
-  var upgradeLevel = 0;
+  // Easter-egg state (driven by robot:* CustomEvents from easteregg.js).
+  var sproutLevel = 0;   // green sprout grows on the head as the robot is clicked
+  var isOptimus = false; // transforms into Optimus Prime after the Snake game
+  var hasBaby = false;   // baby robot companion after the Simon game
   var spinStart = 0, spinUntil = 0;
   var buddyCanvas = null, buddyCtx = null, buddyX = 0;
 
@@ -161,9 +215,9 @@
     say(MESSAGES[(Math.floor(performance.now() / 137)) % MESSAGES.length]);
   });
 
-  /* ---------- Companion bot (upgrade level 3) ---------- */
+  /* ---------- Baby robot companion (a mini Optimus) ---------- */
   function ensureCompanion() {
-    if (upgradeLevel >= 3 && !buddyCanvas) {
+    if (hasBaby && !buddyCanvas) {
       buddyCanvas = document.createElement("canvas");
       buddyCanvas.id = "tama-buddy";
       buddyCanvas.width = 40; buddyCanvas.height = 40;
@@ -172,22 +226,26 @@
       buddyCtx = buddyCanvas.getContext("2d");
       buddyCtx.imageSmoothingEnabled = false;
       buddyX = x - 30;
-    } else if (upgradeLevel < 3 && buddyCanvas) {
+    } else if (!hasBaby && buddyCanvas) {
       buddyCanvas.remove(); buddyCanvas = null; buddyCtx = null;
     }
   }
 
+  // Mini Optimus that toddles after the main one.
   function drawBuddy() {
-    var c2 = buddyCtx, px = 2, ox = 4, oy = 4; // 16-grid * 2 = 32, centered in 40
+    var c2 = buddyCtx, px = 2, ox = 4, oy = 6; // 16-grid * 2 = 32, centered in 40
     function k(gx, gy, w, h, col) { c2.fillStyle = col; c2.fillRect(ox + gx * px, oy + gy * px, w * px, h * px); }
     c2.clearRect(0, 0, 40, 40);
     c2.fillStyle = "rgba(0,0,0,0.25)";
     c2.beginPath(); c2.ellipse(20, 38, 9, 2, 0, 0, Math.PI * 2); c2.fill();
-    k(8, 0, 1, 1, COL.gold); k(8, 1, 1, 1, COL.dark);            // antenna
-    k(5, 2, 6, 5, COL.body); k(10, 2, 1, 5, COL.dark); k(5, 3, 5, 2, COL.face); // head
-    k(6, 3, 1, 1, COL.gold); k(9, 3, 1, 1, COL.gold); k(7, 4, 2, 1, COL.mouth); // face
-    k(4, 8, 8, 4, COL.body); k(11, 8, 1, 4, COL.dark); k(7, 9, 2, 2, COL.gold); // body
-    k(5, 12, 2, 3, COL.dark); k(9, 12, 2, 3, COL.dark);          // legs
+    k(4, 2, 1, 2, OPT.sil); k(11, 2, 1, 2, OPT.sil);                 // horns
+    k(5, 2, 6, 3, OPT.blue); k(10, 2, 1, 3, OPT.blueD);             // helmet
+    k(6, 3, 4, 1, OPT.win); k(6, 3, 1, 1, OPT.eye); k(9, 3, 1, 1, OPT.eye); // eyes
+    k(6, 5, 4, 1, OPT.sil);                                         // faceplate
+    k(4, 8, 8, 4, OPT.red); k(11, 8, 1, 4, OPT.redD);              // chest
+    k(5, 8, 2, 2, OPT.win); k(9, 8, 2, 2, OPT.win);                // windows
+    k(4, 11, 8, 1, OPT.sil);                                        // grille
+    k(5, 12, 2, 3, OPT.blue); k(9, 12, 2, 3, OPT.blue);            // legs
   }
 
   /* ---------- Cross-module event API (dispatched by easteregg.js) ---------- */
@@ -196,9 +254,16 @@
     if (reduced) return;
     spinStart = performance.now(); spinUntil = spinStart + 900; happyUntil = spinUntil;
   });
-  document.addEventListener("robot:upgrade", function (e) {
-    upgradeLevel = (e.detail && e.detail.level) | 0;
-    ensureCompanion();
+  document.addEventListener("robot:sprout", function (e) {
+    sproutLevel = Math.max(sproutLevel, (e.detail && e.detail.level) | 0);
+  });
+  document.addEventListener("robot:transform", function () {
+    isOptimus = true;
+    happyUntil = performance.now() + 1600; hopStart = performance.now();
+    if (!reduced) { spinStart = performance.now(); spinUntil = spinStart + 900; }
+  });
+  document.addEventListener("robot:baby", function () {
+    hasBaby = true; ensureCompanion();
   });
 
   /* ---------- Loop ---------- */

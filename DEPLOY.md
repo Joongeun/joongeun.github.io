@@ -60,9 +60,10 @@ mapmyvisitors_url: "https://mapmyvisitors.com/web/<your-id>"
 
 ## Easter-egg step counters (owner only)
 
-How many visitors have solved each step of the gospel-journey easter egg —
-step 1 (Konami code), step 2 (feed the flytrap), step 3 (plant the mustard
-seed). Bookmark these:
+How many visitors have solved each step of the robot easter egg —
+step 1 (enter the Konami code), step 2 (beat the Snake mini-game → the robot
+transforms into Optimus Prime), step 3 (beat the Simon memory game → a baby
+robot spawns). Bookmark these:
 
 - **Stats badge (on the live site):** <https://joon-choi.pages.dev/?eggstats>
   — adds a small "🥚 solved — step 1: N · step 2: N · step 3: N" badge.

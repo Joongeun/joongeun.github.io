@@ -10,22 +10,16 @@
 
   {% include navbar.html %}
 
-  <!-- Falling autumn leaves drifting through the side margins (New England fall) -->
-  <canvas class="leaves" id="leaves" aria-hidden="true"></canvas>
-
   <main class="container">
     {{ content }}
   </main>
 
-  {% include garden.html %}
   {% include tamagotchi.html %}
-  {% include easteregg.html %}
 
   <script>
     window.__ROLES__ = [{% for r in site.data.profile.roles %}{{ r | jsonify }}{% unless forloop.last %}, {% endunless %}{% endfor %}];
   </script>
   <script src="{{ '/assets/js/main.js' | relative_url }}" defer></script>
-  <script src="{{ '/assets/js/garden.js' | relative_url }}" defer></script>
   <script src="{{ '/assets/js/tamagotchi.js' | relative_url }}" defer></script>
   <script src="{{ '/assets/js/easteregg.js' | relative_url }}" defer></script>
 </body>
