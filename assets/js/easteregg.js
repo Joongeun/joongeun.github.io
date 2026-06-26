@@ -114,19 +114,32 @@
     showVerse(verse, advanceHints);
   }
 
-  /* ---------- GATEWAY: rapid robot clicks ---------- */
+  /* ---------- GATEWAY: rapid robot clicks ----------
+   * 5 rapid clicks reveals the secret. After that, the Konami hint keeps
+   * re-appearing every few clicks (until step 1 is solved) so spam-clicking
+   * can't make you miss it. */
   var robot = document.getElementById("tamagotchi");
   var clickTimes = [];
+  var clicksSinceHint = 0;
   if (robot) {
     robot.addEventListener("click", function () {
-      if (state.gateway) return;
+      if (state.stage1) return;                 // solved -> stop nudging
       var t = now();
       clickTimes.push(t);
       clickTimes = clickTimes.filter(function (tt) { return t - tt < 1500; });
-      if (clickTimes.length >= 5) {
-        state.gateway = true;
-        emit("robot:spin");
-        robotSay("you found a secret… gamers know the code ↑↑↓↓…", 4800);
+      if (!state.gateway) {
+        if (clickTimes.length >= 5) {
+          state.gateway = true;
+          clicksSinceHint = 0;
+          emit("robot:spin");
+          robotSay("you found a secret… gamers know the code ↑↑↓↓…", 4800);
+        }
+        return;
+      }
+      // Gateway already found: re-show the full hint every 4th click.
+      if (++clicksSinceHint >= 4) {
+        clicksSinceHint = 0;
+        robotSay("psst — the gamer code: ↑↑↓↓←→←→ B A", 4800);
       }
     });
   }
