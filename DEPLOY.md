@@ -58,6 +58,23 @@ to mapmyvisitors, copy your **public profile / HTML link**, and set it in
 mapmyvisitors_url: "https://mapmyvisitors.com/web/<your-id>"
 ```
 
+## Easter-egg step-1 counter (owner only)
+
+How many visitors have solved **step 1** of the gospel-journey easter egg
+(the Konami code). Bookmark these:
+
+- **Stats badge (on the live site):** <https://joon-choi.pages.dev/?eggstats>
+  — adds a small "🥚 step 1 solved by N people" badge to the page.
+- **Raw JSON:** <https://joon-choi.pages.dev/api/egg> — returns `{"step1":N}`.
+
+Backed by the Cloudflare Pages Function `functions/api/egg.js` + a KV namespace
+bound as **`EGG_KV`** (Pages project → Settings → Functions → KV namespace
+bindings). If the JSON says `"error":"KV not bound"`, the binding is missing or
+the project hasn't been redeployed since it was added.
+
+Each browser is counted once (deduped via a localStorage flag), so re-solving on
+the same browser won't increment it — test fresh counts in a private window.
+
 ## Local development
 
 ```bash
