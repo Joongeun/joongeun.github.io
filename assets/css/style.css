@@ -212,6 +212,10 @@ h2 {
 }
 .project-card:hover .btn-link { border-color: var(--cal-gold); color: var(--cal-gold); }
 
+.btn-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.btn-row .btn-link { text-decoration: none; }
+.btn-row .btn-link:hover { border-color: var(--cal-gold); color: var(--cal-gold); }
+
 /* ---------- Footer ---------- */
 footer { margin-top: 90px; padding: 40px 0 0; border-top: 1px solid var(--border-color); text-align: center; }
 .copyright { font-family: var(--mono-font); font-size: 0.78rem; opacity: 0.6; }

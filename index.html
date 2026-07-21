@@ -33,13 +33,26 @@ layout: default
     <h2>{{ section.title }}</h2>
     <div class="project-grid{% if section.columns == 1 %} single{% endif %}">
       {%- for item in section.items -%}
-        <a class="project-card reveal" href="{{ item.href }}" target="_blank" rel="noopener">
-          <div class="card-body">
-            <h3>{{ item.name }}</h3>
-            <p>{{ item.desc }}</p>
+        {%- if item.href2 -%}
+          <div class="project-card reveal">
+            <div class="card-body">
+              <h3>{{ item.name }}</h3>
+              <p>{{ item.desc }}</p>
+            </div>
+            <div class="btn-row">
+              <a class="btn-link" href="{{ item.href }}" target="_blank" rel="noopener">{{ item.cta }}</a>
+              <a class="btn-link" href="{{ item.href2 }}" target="_blank" rel="noopener">{{ item.cta2 }}</a>
+            </div>
           </div>
-          <span class="btn-link">{{ item.cta }}</span>
-        </a>
+        {%- else -%}
+          <a class="project-card reveal" href="{{ item.href }}" target="_blank" rel="noopener">
+            <div class="card-body">
+              <h3>{{ item.name }}</h3>
+              <p>{{ item.desc }}</p>
+            </div>
+            <span class="btn-link">{{ item.cta }}</span>
+          </a>
+        {%- endif -%}
       {%- endfor -%}
     </div>
   </section>

@@ -34,12 +34,14 @@
   items:
     - name: "SnapCycle (Berkeley AI Hackathon)"
       href: "https://github.com/Joongeun/SnapCycle"
+      href2: "https://joongeun.github.io/snapcycle-site/"
       desc: >-
         An end-to-end platform that helps users discover, choose, and utilize
         local disposal pathways with just a photo of an item they want off their
         hands. Built at the Berkeley AI Hackathon with Gemini vision, FastAPI,
         and React Native.
       cta: "View Code"
+      cta2: "Website"
     - name: "Multi-Agent Pipeline for CMOS Sizing (EDA)"
       href: "https://github.com/Joongeun/Multi-Agent-System-with-Human-in-the-Loop-Feedback-for-CMOS-Sizing"
       desc: >-
